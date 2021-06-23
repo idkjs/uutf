@@ -1,0 +1,32 @@
+{
+  "name": "reason-uutf",
+  "version": "1.0.2",
+  "description": "Uutf — Non-blocking streaming Unicode codec for OCaml",
+  "main": "index.js",
+  "files": [
+    "src/uutf.re",
+    "src/uutf.rei",
+    "opam",
+    "bsconfig.json"
+  ],
+  "scripts": {
+    "build": "bsb -make-world",
+    "start": "bsb -make-world -w",
+    "clean": "bsb -clean-world",
+    "test": "npm run build && node test/uutf_test.bs.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dbuenzli/uutf.git"
+  },
+  "keywords": [ "Reason", "unicode", "text", "utf-8", "utf-16", "codec", "org:erratique" ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dbuenzli/uutf/issues"
+  },
+  "homepage": "https://github.com/dbuenzli/uutf#readme",
+  "devDependencies": {
+    "bs-platform": "^9.0.2"
+  }
+}

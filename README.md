@@ -1,6 +1,6 @@
 Uutf — Non-blocking streaming Unicode codec for OCaml
 -------------------------------------------------------------------------------
-%%VERSION%%
+V1.0.2
 
 Uutf is a non-blocking streaming codec to decode and encode the UTF-8,
 UTF-16, UTF-16LE and UTF-16BE encoding schemes. It can efficiently
@@ -13,7 +13,7 @@ Buffer.t values.
 
 Uutf has no dependency and is distributed under the ISC license.
 
-Home page: http://erratique.ch/software/uutf  
+Home page: http://erratique.ch/software/uutf
 Contact: Daniel Bünzli `<daniel.buenzl i@erratique.ch>`
 
 
@@ -46,6 +46,6 @@ distribution. They can be built and run with:
 The resulting binaries are in `_build/test` :
 
 - `test.native` tests the library, nothing should fail.
-- `utftrip.native`, among other things, reads unicode on `stdin` and rewrites 
+- `utftrip.native`, among other things, reads unicode on `stdin` and rewrites
   it on `stdout`. Invoke with `--help` for more information. Depends
   on [Cmdliner](http://erratique.ch/software/cmdliner).

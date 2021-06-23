@@ -1,10 +1,10 @@
-(*---------------------------------------------------------------------------
+/*---------------------------------------------------------------------------
    Copyright (c) 2012 Daniel C. Bünzli. All rights reserved.
    Distributed under the ISC license, see terms at the end of the file.
    %%NAME%% %%VERSION%%
-  ---------------------------------------------------------------------------*)
+  ---------------------------------------------------------------------------*/
 
-(** Non-blocking streaming Unicode codec.
+/** Non-blocking streaming Unicode codec.
 
   [Uutf] is a non-blocking streaming codec to {{:#decode}decode} and
   {{:#encode}encode} the {{:http://www.ietf.org/rfc/rfc3629.txt}
@@ -27,50 +27,56 @@
     {- The Unicode Consortium.
     {e {{:http://www.unicode.org/versions/latest}The Unicode Standard}}.
     (latest version)}}
-*)
+*/;
 
-  (** {1:ucharcsts Special Unicode characters} *)
+/** {1:ucharcsts Special Unicode characters} */;
 
-val u_bom : Uchar.t
-(** [u_bom] is the {{:http://unicode.org/glossary/#byte_order_mark}byte
-    order mark} (BOM) character ([U+FEFF]). *)
+/** [u_bom] is the {{:http://unicode.org/glossary/#byte_order_mark}byte
+    order mark} (BOM) character ([U+FEFF]). */
 
-val u_rep : Uchar.t
-(** [u_rep] is the
+let u_bom: Uchar.t;
+
+/** [u_rep] is the
     {{:http://unicode.org/glossary/#replacement_character}replacement}
-    character ([U+FFFD]). *)
+    character ([U+FFFD]). */
 
-(** {1:schemes Unicode encoding schemes} *)
+let u_rep: Uchar.t;
 
-type encoding = [ `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8 ]
-(** The type for Unicode
+/** {1:schemes Unicode encoding schemes} */;
+
+/** The type for Unicode
     {{:http://unicode.org/glossary/#character_encoding_scheme}encoding
-    schemes}. *)
+    schemes}. */
 
-type decoder_encoding = [ encoding | `US_ASCII | `ISO_8859_1 ]
-(** The type for encoding schemes {e decoded} by [Uutf]. Unicode encoding
+type encoding = [ | `UTF_16 | `UTF_16BE | `UTF_16LE | `UTF_8];
+
+/** The type for encoding schemes {e decoded} by [Uutf]. Unicode encoding
     schemes plus {{:http://tools.ietf.org/html/rfc20}US-ASCII} and
     {{:http://www.ecma-international.org/publications/standards/Ecma-094.htm}
-    ISO/IEC 8859-1} (latin-1). *)
+    ISO/IEC 8859-1} (latin-1). */
 
-val encoding_of_string : string -> decoder_encoding option
-(** [encoding_of_string s] converts a (case insensitive)
+type decoder_encoding = [ encoding | `US_ASCII | `ISO_8859_1];
+
+/** [encoding_of_string s] converts a (case insensitive)
     {{:http://www.iana.org/assignments/character-sets}IANA character set name}
-    to an encoding. *)
+    to an encoding. */
 
-val encoding_to_string : [< decoder_encoding] -> string
-(** [encoding_to_string e] is a
+let encoding_of_string: string => option(decoder_encoding);
+
+/** [encoding_to_string e] is a
     {{:http://www.iana.org/assignments/character-sets}IANA character set name}
-    for [e]. *)
+    for [e]. */
 
-(** {1:decode Decode} *)
+let encoding_to_string: [< decoder_encoding] => string;
 
-type src = [ `Channel of in_channel | `String of string | `Manual ]
-(** The type for input sources. With a [`Manual] source the client
-    must provide input with {!Manual.src}. *)
+/** {1:decode Decode} */;
 
-type nln = [ `ASCII of Uchar.t | `NLF of Uchar.t | `Readline of Uchar.t ]
-(** The type for newline normalizations. The variant argument is the
+/** The type for input sources. With a [`Manual] source the client
+    must provide input with {!Manual.src}. */
+
+type src = [ | `Channel(in_channel) | `String(string) | `Manual];
+
+/** The type for newline normalizations. The variant argument is the
     normalization character.
     {ul
     {- [`ASCII], normalizes CR ([U+000D]), LF ([U+000A]) and CRLF
@@ -83,14 +89,15 @@ type nln = [ `ASCII of Uchar.t | `NLF of Uchar.t | `Readline of Uchar.t ]
     Used with an appropriate normalization character the [`NLF] and
     [`Readline] normalizations allow to implement all the different
     recommendations of Unicode's newline guidelines (section 5.8 in
-    Unicode 9.0.0). *)
+    Unicode 9.0.0). */
 
-type decoder
-(** The type for decoders. *)
+type nln = [ | `ASCII(Uchar.t) | `NLF(Uchar.t) | `Readline(Uchar.t)];
 
-val decoder : ?nln:[< nln] -> ?encoding:[< decoder_encoding] -> [< src] ->
-  decoder
-(** [decoder nln encoding src] is a decoder that inputs from [src].
+/** The type for decoders. */
+
+type decoder;
+
+/** [decoder nln encoding src] is a decoder that inputs from [src].
 
     {b Byte order mark.}
     {{:http://unicode.org/glossary/#byte_order_mark}Byte order mark}
@@ -170,11 +177,12 @@ xx xx .. | `UTF_16BE | Not UTF-8 => UTF-16, no BOM => UTF-16BE
     display program's rendering engine. Depending on the context better column
     increments can be implemented by using {!Uucp.Break.tty_width_hint} or
     {{:http://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries}
-    grapheme cluster boundaries} (see {!Uuseg}). *)
+    grapheme cluster boundaries} (see {!Uuseg}). */
 
-val decode : decoder ->
-  [ `Await | `Uchar of Uchar.t | `End | `Malformed of string]
-(** [decode d] is:
+let decoder:
+  (~nln: [< nln]=?, ~encoding: [< decoder_encoding]=?, [< src]) => decoder;
+
+/** [decode d] is:
     {ul
     {- [`Await] if [d] has a [`Manual] input source and awaits
        for more input. The client must use {!Manual.src} to provide it.}
@@ -188,82 +196,100 @@ val decode : decoder ->
        character to the parsed data, see the {{:#examples}examples}.}}
 
     {b Note.} Repeated invocation always eventually returns [`End], even
-    in case of errors.  *)
+    in case of errors.  */
 
-val decoder_encoding : decoder -> decoder_encoding
-(** [decoder_encoding d] is [d]'s the decoded encoding scheme of [d].
+let decode:
+  decoder => [ | `Await | `Uchar(Uchar.t) | `End | `Malformed(string)];
+
+/** [decoder_encoding d] is [d]'s the decoded encoding scheme of [d].
 
     {b Warning.} If the decoder guesses the encoding or uses [`UTF_16],
-    rely on this value only after the first [`Uchar] was decoded. *)
+    rely on this value only after the first [`Uchar] was decoded. */
 
-(**/**)
+let decoder_encoding: decoder => decoder_encoding;
 
-(* This function is dangerous, it may destroy the current continuation.
-   But it's needed for things like XML parsers. *)
 
-val set_decoder_encoding : decoder -> [< decoder_encoding] -> unit
-(** [set_decoder_encoding d enc] changes the decoded encoding
+
+/* This function is dangerous, it may destroy the current continuation.
+   But it's needed for things like XML parsers. */
+
+/** [set_decoder_encoding d enc] changes the decoded encoding
     to [enc] after decoding started.
 
     {b Warning.} Call only after {!decode} was called on [d] and that the
     last call to it returned something different from [`Await] or data may
-    be lost. After encoding guess wait for at least three [`Uchar]s. *)
+    be lost. After encoding guess wait for at least three [`Uchar]s. */
 
-(**/**)
+let set_decoder_encoding: (decoder, [< decoder_encoding]) => unit;
 
-val decoder_line : decoder -> int
-(** [decoder_line d] is the line number of the last
-    decoded (or malformed) character. See {!decoder} for details. *)
 
-val decoder_col : decoder -> int
-(** [decoder_col d] is the column number of the last decoded
-    (or malformed) character. See {!decoder} for details. *)
 
-val decoder_byte_count : decoder -> int
-(** [decoder_byte_count d] is the number of bytes already decoded on
+/** [decoder_line d] is the line number of the last
+    decoded (or malformed) character. See {!decoder} for details. */
+
+let decoder_line: decoder => int;
+
+/** [decoder_col d] is the column number of the last decoded
+    (or malformed) character. See {!decoder} for details. */
+
+let decoder_col: decoder => int;
+
+/** [decoder_byte_count d] is the number of bytes already decoded on
     [d] (including malformed ones). This is the last {!decode}'s
-    end byte offset counting from the beginning of the stream. *)
+    end byte offset counting from the beginning of the stream. */
 
-val decoder_count : decoder -> int
-(** [decoder_count d] is the number of characters already decoded on [d]
-    (including malformed ones). See {!decoder} for details. *)
+let decoder_byte_count: decoder => int;
 
-val decoder_removed_bom : decoder -> bool
-(** [decoder_removed_bom d] is [true] iff an {e initial}
+/** [decoder_count d] is the number of characters already decoded on [d]
+    (including malformed ones). See {!decoder} for details. */
+
+let decoder_count: decoder => int;
+
+/** [decoder_removed_bom d] is [true] iff an {e initial}
     {{:http://unicode.org/glossary/#byte_order_mark}BOM} was
-    removed from the input stream. See {!decoder} for details. *)
+    removed from the input stream. See {!decoder} for details. */
 
-val decoder_src : decoder -> src
-(** [decoder_src d] is [d]'s input source. *)
+let decoder_removed_bom: decoder => bool;
 
-val decoder_nln : decoder -> nln option
-(** [decoder_nln d] returns [d]'s newline normalization (if any). *)
+/** [decoder_src d] is [d]'s input source. */
 
-val pp_decode : Format.formatter ->
-  [< `Await | `Uchar of Uchar.t | `End | `Malformed of string] -> unit
-(** [pp_decode ppf v] prints an unspecified representation of [v] on
-    [ppf]. *)
+let decoder_src: decoder => src;
 
-(** {1:encode Encode} *)
+/** [decoder_nln d] returns [d]'s newline normalization (if any). */
 
-type dst = [ `Channel of out_channel | `Buffer of Buffer.t | `Manual ]
-(** The type for output destinations. With a [`Manual] destination the client
-    must provide output storage with {!Manual.dst}. *)
+let decoder_nln: decoder => option(nln);
 
-type encoder
-(** The type for Unicode encoders. *)
+/** [pp_decode ppf v] prints an unspecified representation of [v] on
+    [ppf]. */
 
-val encoder : [< encoding] -> [< dst] -> encoder
-(** [encoder encoding dst] is an encoder for [encoding] that outputs
+let pp_decode:
+  (
+    Format.formatter,
+    [< | `Await | `Uchar(Uchar.t) | `End | `Malformed(string)]
+  ) =>
+  unit;
+
+/** {1:encode Encode} */;
+
+/** The type for output destinations. With a [`Manual] destination the client
+    must provide output storage with {!Manual.dst}. */
+
+type dst = [ | `Channel(out_channel) | `Buffer(Buffer.t) | `Manual];
+
+/** The type for Unicode encoders. */
+
+type encoder;
+
+/** [encoder encoding dst] is an encoder for [encoding] that outputs
     to [dst].
 
     {b Note.} No initial
     {{:http://unicode.org/glossary/#byte_order_mark}BOM}
-    is encoded. If needed, this duty is left to the client. *)
+    is encoded. If needed, this duty is left to the client. */
 
-val encode :
-  encoder -> [<`Await | `End | `Uchar of Uchar.t ] -> [`Ok | `Partial ]
-(** [encode e v] is :
+let encoder: ([< encoding], [< dst]) => encoder;
+
+/** [encode e v] is :
     {ul
     {- [`Partial] iff [e] has a [`Manual] destination and needs more output
        storage. The client must use {!Manual.dst} to provide a new buffer
@@ -277,103 +303,120 @@ val encode :
     was written).
 
     {b Raises.} [Invalid_argument] if an [`Uchar] or [`End] is encoded
-    after a [`Partial] encode. *)
+    after a [`Partial] encode. */
 
-val encoder_encoding : encoder -> encoding
-(** [encoder_encoding e] is [e]'s encoding. *)
+let encode:
+  (encoder, [< | `Await | `End | `Uchar(Uchar.t)]) => [ | `Ok | `Partial];
 
-val encoder_dst : encoder -> dst
-(** [encoder_dst e] is [e]'s output destination. *)
+/** [encoder_encoding e] is [e]'s encoding. */
 
-(** {1:manual Manual sources and destinations.} *)
+let encoder_encoding: encoder => encoding;
 
-(** Manual sources and destinations.
+/** [encoder_dst e] is [e]'s output destination. */
 
-    {b Warning.} Use only with [`Manual] decoder and encoders. *)
-module Manual : sig
-  val src : decoder -> Bytes.t -> int -> int -> unit
-  (** [src d s j l] provides [d] with [l] bytes to read, starting at
+let encoder_dst: encoder => dst;
+
+/** {1:manual Manual sources and destinations.} */;
+
+/** Manual sources and destinations.
+
+    {b Warning.} Use only with [`Manual] decoder and encoders. */
+
+module Manual: {
+  /** [src d s j l] provides [d] with [l] bytes to read, starting at
       [j] in [s]. This byte range is read by calls to {!decode} with [d]
       until [`Await] is returned. To signal the end of input call the function
-      with [l = 0]. *)
+      with [l = 0]. */
 
-  val dst : encoder -> Bytes.t -> int -> int -> unit
-  (** [dst e s j l] provides [e] with [l] bytes to write, starting
+  let src: (decoder, Bytes.t, int, int) => unit;
+
+  /** [dst e s j l] provides [e] with [l] bytes to write, starting
       at [j] in [s]. This byte range is written by calls to {!encode} with [e]
       until [`Partial] is returned. Use {!dst_rem} to know the remaining
-      number of non-written free bytes in [s]. *)
+      number of non-written free bytes in [s]. */
 
-  val dst_rem : encoder -> int
-  (** [dst_rem e] is the remaining number of non-written, free bytes
-      in the last buffer provided with {!Manual.dst}. *)
-end
+  let dst: (encoder, Bytes.t, int, int) => unit;
 
-(** {1:strbuf String folders and Buffer encoders} *)
+  /** [dst_rem e] is the remaining number of non-written, free bytes
+      in the last buffer provided with {!Manual.dst}. */
 
-(** Fold over the characters of UTF encoded OCaml [string] values. *)
-module String : sig
+  let dst_rem: encoder => int;
+};
 
-(** {1 Encoding guess} *)
+/** {1:strbuf String folders and Buffer encoders} */;
 
-  val encoding_guess : string -> [ `UTF_8 | `UTF_16BE | `UTF_16LE ] * bool
-  (** [encoding_guess s] is the encoding guessed for [s] coupled with
+/** Fold over the characters of UTF encoded OCaml [string] values. */
+
+module String: {
+  /** {1 Encoding guess} */;
+
+  /** [encoding_guess s] is the encoding guessed for [s] coupled with
       [true] iff there's an initial
-      {{:http://unicode.org/glossary/#byte_order_mark}BOM}. *)
+      {{:http://unicode.org/glossary/#byte_order_mark}BOM}. */
 
-(** {1 String folders}
+  let encoding_guess: string => ([ | `UTF_8 | `UTF_16BE | `UTF_16LE], bool);
+
+  /** {1 String folders}
 
     {b Note.} Initial {{:http://unicode.org/glossary/#byte_order_mark}BOM}s
-    are also folded over. *)
+    are also folded over. */;
 
-  type 'a folder = 'a -> int -> [ `Uchar of Uchar.t | `Malformed of string ] ->
-    'a
-  (** The type for character folders. The integer is the index in the
-      string where the [`Uchar] or [`Malformed] starts. *)
+  /** The type for character folders. The integer is the index in the
+      string where the [`Uchar] or [`Malformed] starts. */
 
-  val fold_utf_8 : ?pos:int -> ?len:int -> 'a folder -> 'a -> string -> 'a
-  (** [fold_utf_8 f a s ?pos ?len ()] is
+  type folder('a) =
+    ('a, int, [ | `Uchar(Uchar.t) | `Malformed(string)]) => 'a;
+
+  /** [fold_utf_8 f a s ?pos ?len ()] is
       [f (] ... [(f (f a pos u]{_0}[) j]{_1}[ u]{_1}[)] ... [)] ... [)
       j]{_n}[ u]{_n}
       where [u]{_i}, [j]{_i} are characters and their start position
       in the UTF-8 encoded substring [s] starting at [pos] and [len]
       long. The default value for [pos] is [0] and [len] is
-      [String.length s - pos]. *)
+      [String.length s - pos]. */
 
-  val fold_utf_16be : ?pos:int -> ?len:int -> 'a folder -> 'a -> string -> 'a
-  (** [fold_utf_16be f a s ?pos ?len ()] is
+  let fold_utf_8: (~pos: int=?, ~len: int=?, folder('a), 'a, string) => 'a;
+
+  /** [fold_utf_16be f a s ?pos ?len ()] is
       [f (] ... [(f (f a pos u]{_0}[) j]{_1}[ u]{_1}[)] ... [)] ... [)
       j]{_n}[ u]{_n}
       where [u]{_i}, [j]{_i} are characters and their start position
       in the UTF-8 encoded substring [s] starting at [pos] and [len]
       long. The default value for [pos] is [0] and [len] is
-      [String.length s - pos]. *)
+      [String.length s - pos]. */
 
-  val fold_utf_16le : ?pos:int -> ?len:int -> 'a folder -> 'a -> string -> 'a
-  (** [fold_utf_16le f a s ?pos ?len ()] is
+  let fold_utf_16be: (~pos: int=?, ~len: int=?, folder('a), 'a, string) => 'a;
+
+  /** [fold_utf_16le f a s ?pos ?len ()] is
       [f (] ... [(f (f a pos u]{_0}[) j]{_1}[ u]{_1}[)] ... [)] ... [)
       j]{_n}[ u]{_n}
       where [u]{_i}, [j]{_i} are characters and their start position
       in the UTF-8 encoded substring [s] starting at [pos] and [len]
       long. The default value for [pos] is [0] and [len] is
-      [String.length s - pos]. *)
-end
+      [String.length s - pos]. */
 
-(**  UTF encode characters in OCaml {!Buffer.t} values. *)
-module Buffer : sig
+  let fold_utf_16le: (~pos: int=?, ~len: int=?, folder('a), 'a, string) => 'a;
+};
 
-  (** {1 Buffer encoders} *)
+/**  UTF encode characters in OCaml {!Buffer.t} values. */
 
-  val add_utf_8 : Buffer.t -> Uchar.t -> unit
-  (** [add_utf_8 b u] adds the UTF-8 encoding of [u] to [b]. *)
+module Buffer: {
+  /** {1 Buffer encoders} */;
 
-  val add_utf_16be : Buffer.t -> Uchar.t -> unit
-  (** [add_utf_16be b u] adds the UTF-16BE encoding of [u] to [b]. *)
+  /** [add_utf_8 b u] adds the UTF-8 encoding of [u] to [b]. */
 
-  val add_utf_16le : Buffer.t -> Uchar.t -> unit
-  (** [add_utf_16le b u] adds the UTF-16LE encoding of [u] to [b]. *)
-end
+  let add_utf_8: (Buffer.t, Uchar.t) => unit;
 
-(** {1:examples Examples}
+  /** [add_utf_16be b u] adds the UTF-16BE encoding of [u] to [b]. */
+
+  let add_utf_16be: (Buffer.t, Uchar.t) => unit;
+
+  /** [add_utf_16le b u] adds the UTF-16LE encoding of [u] to [b]. */
+
+  let add_utf_16le: (Buffer.t, Uchar.t) => unit;
+};
+
+/** {1:examples Examples}
 
     {2:readlines Read lines}
 
@@ -484,9 +527,9 @@ end
   let e = Uutf.encoder out_encoding `Manual in
   Uutf.Manual.dst e es 0 (Bytes.length es);
   loop fdi fdo ds es d e]}
-*)
+*/;
 
-(*---------------------------------------------------------------------------
+/*---------------------------------------------------------------------------
    Copyright (c) 2012 Daniel C. Bünzli
 
    Permission to use, copy, modify, and/or distribute this software for any
@@ -500,4 +543,4 @@ end
    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-  ---------------------------------------------------------------------------*)
+  ---------------------------------------------------------------------------*/
